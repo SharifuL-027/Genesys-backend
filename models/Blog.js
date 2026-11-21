@@ -53,6 +53,10 @@ const blogSchema = new mongoose.Schema(
       enum: ['Draft', 'Published'],
       default: 'Published',
     },
+    publishedDate: {
+    type: Date,
+    default: Date.now,
+    },
   },
   { timestamps: true }
 );

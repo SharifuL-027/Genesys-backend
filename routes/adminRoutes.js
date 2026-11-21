@@ -167,7 +167,7 @@ router.post(
 // @route   GET /api/admin/blogs (Includes Drafts & Published)
 router.get('/blogs', protectAdmin, async (req, res, next) => {
   try {
-    const blogs = await Blog.find().sort({ createdAt: -1 });
+    const blogs = await Blog.find().sort({ publishedDate: -1, createdAt: -1 });
     res.status(200).json({ success: true, count: blogs.length, data: blogs });
   } catch (error) {
     next(error);
@@ -182,7 +182,18 @@ router.post(
   upload.single('coverImage'),
   async (req, res, next) => {
     try {
-      const { title, excerpt, content, category, tags, author, readTime, status, coverImageUrl } = req.body;
+      const {
+        title,
+        excerpt,
+        content,
+        category,
+        tags,
+        author,
+        readTime,
+        status,
+        coverImageUrl,
+        publishedDate,
+      } = req.body;
 
       if (!title || !excerpt || !content) {
         return res.status(400).json({
@@ -234,6 +245,7 @@ router.post(
         author: author || 'Genesys Editorial Team',
         readTime: readTime || '5 min read',
         status: status || 'Published',
+        publishedDate: publishedDate ? new Date(publishedDate) : Date.now(),
       });
 
       res.status(201).json({
@@ -260,7 +272,17 @@ router.put(
         return res.status(404).json({ success: false, message: 'Blog not found' });
       }
 
-      const { title, excerpt, content, category, tags, author, readTime, status } = req.body;
+      const {
+        title,
+        excerpt,
+        content,
+        category,
+        tags,
+        author,
+        readTime,
+        status,
+        publishedDate,
+      } = req.body;
 
       if (req.file) {
         // Delete previous image from Cloudinary if exists
@@ -285,6 +307,7 @@ router.put(
       if (author) blog.author = author;
       if (readTime) blog.readTime = readTime;
       if (status) blog.status = status;
+      if (publishedDate) blog.publishedDate = new Date(publishedDate);
 
       if (tags !== undefined) {
         blog.tags = Array.isArray(tags)

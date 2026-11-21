@@ -24,8 +24,8 @@ router.get('/', async (req, res, next) => {
     }
 
     const blogs = await Blog.find(query)
-      .select('-content') 
-      .sort({ createdAt: -1 });
+      .select('-content')
+      .sort({ publishedDate: -1, createdAt: -1 }); // Sort by custom date first, then creation time
 
     res.status(200).json({
       success: true,
